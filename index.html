@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>BMKG Earthquake Information</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+         rel="stylesheet"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0/build/global/luxon.min.js"></script>
+      <link
+         rel="stylesheet"
+         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      />
+      <link
+         rel="stylesheet"
+         href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+      <link
+         rel="stylesheet"
+         href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      />
+      <script>
+         tailwind.config = {
+            theme: {
+               extend: {
+                  fontFamily: {
+                     sans: ["Inter", "sans-serif"],
+                  },
+                  colors: {
+                     "bmkg-blue": "#0077be",
+                     "bmkg-red": "#d32f2f",
+                     "bmkg-dark-blue": "#005a8c",
+                  },
+               },
+            },
+         };
+      </script>
+      <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+   </head>
+   <body class="bg-gray-100 font-sans flex flex-col min-h-screen text-gray-800">
+      <header
+         class="bg-gradient-to-r from-bmkg-dark-blue to-bmkg-blue text-white py-6 md:py-10 shadow-lg"
+      >
+         <div class="container mx-auto px-4 max-w-6xl">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+               <div class="text-center md:text-left mb-4 md:mb-0">
+                  <h1
+                     class="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 tracking-tight"
+                  >
+                     <i class="fas fa-globe-asia mr-2"></i>BMKG Earthquake Info
+                  </h1>
+                  <p
+                     class="text-lg md:text-xl lg:text-2xl text-blue-100 font-light"
+                  >
+                     <i class="fas fa-broadcast-tower mr-2"></i>Real-time
+                     seismic monitoring
+                  </p>
+               </div>
+               <img
+                  src="assets/img/bmkg.png"
+                  alt="BMKG Logo"
+                  class="w-16 h-auto md:w-20 lg:w-24"
+               />
+            </div>
+            <div
+               id="timeContainer"
+               class="text-white text-sm md:text-base mt-2 md:mt-0"
+            >
+               <span class="hidden md:inline">
+                  <a
+                     href="https://time.bmkg.go.id/"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     class="hover:underline"
+                  >
+                     Standar Waktu Indonesia
+                  </a>
+               </span>
+               <span id="localTime"></span> /
+               <span id="utcTime"></span>
+            </div>
+         </div>
+      </header>
+
+      <main class="flex-grow container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <section
+               class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500 hover:scale-102 fade-in"
+            >
+               <div
+                  class="bg-gradient-to-r from-bmkg-blue to-blue-500 text-white py-3 md:py-4 px-4 md:px-6"
+               >
+                  <h2 class="text-xl md:text-2xl font-semibold tracking-wide">
+                     <i class="fas fa-info-circle mr-2"></i>Latest Earthquake
+                     Information
+                  </h2>
+               </div>
+               <div class="p-4 md:p-6" id="latest-gempa-info">
+                  <!-- Latest earthquake info will be inserted here -->
+               </div>
+            </section>
+
+            <section
+               class="bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500 hover:scale-102 fade-in"
+            >
+               <div
+                  class="bg-gradient-to-r from-bmkg-blue to-blue-500 text-white py-3 md:py-4 px-4 md:px-6"
+               >
+                  <h2 class="text-xl md:text-2xl font-semibold tracking-wide">
+                     <i class="fas fa-map-marked-alt mr-2"></i>Earthquake Map
+                  </h2>
+               </div>
+               <div class="p-4 md:p-6">
+                  <div id="map" class="h-96 rounded-lg shadow-inner"></div>
+               </div>
+            </section>
+         </div>
+         <section
+            class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500 hover:scale-102 fade-in"
+         >
+            <div
+               class="bg-gradient-to-r from-bmkg-blue to-blue-500 text-white py-3 md:py-4 px-4 md:px-6"
+            >
+               <h2 class="text-xl md:text-2xl font-semibold tracking-wide">
+                  <i class="fas fa-hand-paper mr-2"></i>List of 15 Felt
+                  Earthquakes
+               </h2>
+            </div>
+            <div class="p-4 md:p-6 overflow-x-auto">
+               <table class="w-full text-sm" id="gempa-dirasakan-table">
+                  <thead class="bg-gray-100 sticky top-0">
+                     <tr>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Date & Time
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Location
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Magnitude
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Depth
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Region
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Felt
+                        </th>
+                     </tr>
+                  </thead>
+                  <tbody></tbody>
+               </table>
+            </div>
+         </section>
+         <section
+            class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500 hover:scale-102 fade-in"
+         >
+            <div
+               class="bg-gradient-to-r from-bmkg-red to-red-500 text-white py-3 md:py-4 px-4 md:px-6"
+            >
+               <h2 class="text-xl md:text-2xl font-semibold tracking-wide">
+                  <i class="fas fa-list-ol mr-2"></i>Recent Earthquakes M 5.0+
+               </h2>
+            </div>
+            <div class="p-4 md:p-6 overflow-x-auto">
+               <table class="w-full text-sm" id="gempa-table">
+                  <thead class="bg-gray-100 sticky top-0">
+                     <tr>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Date & Time
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Location
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Magnitude
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Depth
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Region
+                        </th>
+                        <th
+                           class="py-3 px-4 text-left font-semibold text-gray-700 uppercase tracking-wider"
+                        >
+                           Potential
+                        </th>
+                     </tr>
+                  </thead>
+                  <tbody></tbody>
+               </table>
+            </div>
+         </section>
+
+         <section
+            class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500 hover:scale-105"
+         >
+            <div
+               class="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 sm:py-4 px-4 sm:px-6"
+            >
+               <h2 class="text-xl sm:text-2xl font-semibold tracking-wide">
+                  <i class="fas fa-chart-line mr-2"></i>Earthquake Frequency
+                  Timeline
+               </h2>
+            </div>
+            <div class="p-2 sm:p-4 md:p-6">
+               <div class="relative w-full h-[50vh] min-h-[300px]">
+                  <canvas id="timelineChart" class="w-full h-full"></canvas>
+               </div>
+            </div>
+         </section>
+      </main>
+
+      <footer
+         class="bg-gradient-to-r from-bmkg-dark-blue to-blue-900 text-white py-6 md:py-10 mt-8 md:mt-12"
+      >
+         <div class="container mx-auto px-4 text-center max-w-6xl">
+            <p class="text-base md:text-lg font-light">
+               <i class="far fa-copyright mr-2"></i>2024 Meteorology,
+               Climatology, and Geophysics Agency (BMKG)
+            </p>
+            <p class="mt-2 text-blue-200 text-xs md:text-sm">
+               <i class="fas fa-chart-line mr-2"></i>Providing accurate and
+               timely seismic information
+            </p>
+         </div>
+      </footer>
+
+      <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+      <script src="./assets/js/app.js"></script>
+   </body>
+</html>
