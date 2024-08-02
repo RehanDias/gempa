@@ -82,15 +82,6 @@ Instantly view details of the most recent seismic activity:
 
 <hr>
 
-## 📸 Screenshots
-
-<div align="center">
-  <img src="path_to_screenshot1.png" alt="Dashboard Overview" width="45%">
-  <img src="path_to_screenshot2.png" alt="Interactive Map" width="45%">
-</div>
-
-<hr>
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -105,16 +96,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-For questions or feedback, please contact:
+For questions or feedback about this project, please contact:
 
-BMKG (Meteorology, Climatology, and Geophysics Agency)
+-  📧 Email: [rehanpratama282@gmail.com](mailto:rehanpratama282@gmail.com)
+-  📸 Instagram: [@rehandiazz](https://www.instagram.com/rehandiazz)
 
--  🌐 Website: [https://www.bmkg.go.id/](https://www.bmkg.go.id/)
--  📧 Email: [info@bmkg.go.id](mailto:info@bmkg.go.id)
--  🐦 Twitter: [@infoBMKG](https://twitter.com/infoBMKG)
+For official BMKG information:
+
+-  🌐 BMKG Website: [https://www.bmkg.go.id/](https://www.bmkg.go.id/)
 
 <hr>
 
 <div align="center">
-  <sub>Built with ❤️ by the BMKG team</sub>
+  <sub>Built with ❤️ by rehan dias/sub>
 </div>
