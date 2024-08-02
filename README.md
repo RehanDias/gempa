@@ -108,5 +108,5 @@ For official BMKG information:
 <hr>
 
 <div align="center">
-  <sub>Built with ❤️ by rehan dias/sub>
+  <sub>Built with ❤️ by rehan dias</sub>
 </div>
