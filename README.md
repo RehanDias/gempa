@@ -1,84 +1,120 @@
-# BMKG Earthquake Information Website 🌍🌋
+# 🌍 BMKG Earthquake Information Dashboard
 
-<img src="assets/img/bmkg.png" alt="BMKG Logo" width="100">
+<div align="center">
+  <img src="assets/img/bmkg.png" alt="BMKG Logo" width="150">
+  <br>
+  <i>Real-time seismic monitoring for Indonesia</i>
+</div>
 
-This website provides real-time seismic monitoring and the latest information on earthquakes in the Indonesian region based on data from the Meteorology, Climatology, and Geophysics Agency (BMKG).
+<hr>
 
-## Key Features 📋🌐
+## 🌟 Features
 
-### Latest Earthquake Information 🌟
+| Feature               | Description                                              |
+| --------------------- | -------------------------------------------------------- |
+| 📡 Real-time Updates  | Get the latest earthquake data as it happens             |
+| 🗺️ Interactive Map    | Visualize earthquake locations on a dynamic map          |
+| 📊 Data Visualization | Explore earthquake trends with intuitive charts          |
+| 🔔 Felt Reports       | Access information on earthquakes felt by the population |
+| 📱 Responsive Design  | Seamless experience across desktop and mobile devices    |
 
-Displays detailed information about the most recent earthquake, including:
+<hr>
 
--  📅 Date and Time
--  🌐 Location (Latitude and Longitude)
--  🌋 Magnitude
--  🌊 Depth
--  🗺️ Region
--  💥 Potential impacts
--  😳 Felt reports
+## 📊 Dashboard Sections
 
-### Interactive Earthquake Map 🗺️
+### 1. Latest Earthquake Information
 
-A dynamic map showing the location of recent earthquakes.
+Instantly view details of the most recent seismic activity:
 
-### List of 15 Felt Earthquakes 🤲
+-  🕒 Date and Time
+-  📍 Precise Location
+-  📏 Magnitude and Depth
+-  🏘️ Affected Region
+-  💥 Potential Impacts
 
-Provides information on the 15 most recently felt earthquakes, including:
+### 2. Interactive Earthquake Map
 
--  📅 Date and Time
--  🌐 Location
--  🌋 Magnitude
--  🌊 Depth
--  🗺️ Region
--  😳 Felt intensity
+-  🌐 Dynamically plotted earthquake locations
+-  🔍 Zoom and pan for detailed exploration
 
-### Recent Earthquakes M 5.0+ 📈
+### 3. Felt Earthquakes List
 
-Lists information on recent earthquakes with a magnitude of 5.0 or higher, including:
+-  👥 Top 15 earthquakes felt by the population
+-  🤲 Includes felt intensity reports
 
--  📅 Date and Time
--  🌐 Location
--  🌋 Magnitude
--  🌊 Depth
--  🗺️ Region
--  💥 Potential impacts
+### 4. Major Earthquakes (M 5.0+)
 
-### Earthquake Frequency Timeline 📊
+-  💪 List of significant seismic events
+-  🚨 Potential hazard information
 
-A chart displaying the frequency of earthquakes over time.
+### 5. Earthquake Frequency Timeline
 
-## Technologies Used 💻
+-  📈 Visual representation of seismic activity over time
+-  🔍 Identify patterns and trends
 
--  HTML5
--  Tailwind CSS
--  JavaScript
--  Chart.js
--  Leaflet.js
--  Luxon
--  Font Awesome
--  Fancybox
+<hr>
 
-## How to Use the Website 🌐👨‍💻
+## 🛠️ Technologies
 
-1. Open the website in your web browser.
-2. The main page displays the latest earthquake information and an interactive map.
-3. Scroll down to view the list of felt earthquakes and recent earthquakes M 5.0+.
-4. Explore the earthquake frequency timeline at the bottom of the page.
+<div align="center">
 
-## Local Development 🛠️
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)
 
-To run this website locally:
+</div>
 
-1. Clone the repository
-2. Open the `index.html` file in your web browser
+<hr>
 
-Note: Some features may require a local server to function properly due to CORS restrictions.
+## 🚀 Quick Start
 
-## Contact 📧📞
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/bmkg-earthquake-dashboard.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd bmkg-earthquake-dashboard
+   ```
+3. Open `index.html` in your browser or use a local server for full functionality.
 
-For questions or suggestions, please contact the Meteorology, Climatology, and Geophysics Agency (BMKG).
+<hr>
 
-Visit the official BMKG website: [https://www.bmkg.go.id/](https://www.bmkg.go.id/)
+## 📸 Screenshots
 
-Thank you for using the BMKG Earthquake Information Website! 🙏
+<div align="center">
+  <img src="path_to_screenshot1.png" alt="Dashboard Overview" width="45%">
+  <img src="path_to_screenshot2.png" alt="Interactive Map" width="45%">
+</div>
+
+<hr>
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+<hr>
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+<hr>
+
+## 📞 Contact
+
+For questions or feedback, please contact:
+
+BMKG (Meteorology, Climatology, and Geophysics Agency)
+
+-  🌐 Website: [https://www.bmkg.go.id/](https://www.bmkg.go.id/)
+-  📧 Email: [info@bmkg.go.id](mailto:info@bmkg.go.id)
+-  🐦 Twitter: [@infoBMKG](https://twitter.com/infoBMKG)
+
+<hr>
+
+<div align="center">
+  <sub>Built with ❤️ by the BMKG team</sub>
+</div>
