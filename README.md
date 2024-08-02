@@ -1,52 +1,84 @@
 # BMKG Earthquake Information Website 🌍🌋
 
-<img src="https://cdn.bmkg.go.id/Web/Logo-BMKG-new.png" alt="BMKG Logo" width="100" height="134">
+<img src="assets/img/bmkg.png" alt="BMKG Logo" width="100">
 
-This website provides the latest information on earthquakes in the Indonesian region based on data from the Meteorology, Climatology, and Geophysics Agency (BMKG). Here's a brief description of the main elements of this web page:
+This website provides real-time seismic monitoring and the latest information on earthquakes in the Indonesian region based on data from the Meteorology, Climatology, and Geophysics Agency (BMKG).
 
 ## Key Features 📋🌐
 
 ### Latest Earthquake Information 🌟
 
-This page displays information about the most recent earthquakes that have occurred in Indonesia. The information includes:
+Displays detailed information about the most recent earthquake, including:
 
--  📅 Date
--  ⏰ Time
--  🌐 Latitude
--  🌐 Longitude
+-  📅 Date and Time
+-  🌐 Location (Latitude and Longitude)
 -  🌋 Magnitude
 -  🌊 Depth
 -  🗺️ Region
--  💥 Potential
--  😳 Felt Reports
--  🗺️ Shakemap
+-  💥 Potential impacts
+-  😳 Felt reports
 
-### 15 Earthquakes M 5.0+ 📈🚀
+### Interactive Earthquake Map 🗺️
 
-This page presents information on the 15 earthquakes with a magnitude of 5.0 or higher that have occurred in the Indonesian region. The information provided includes:
+A dynamic map showing the location of recent earthquakes.
 
--  🔢 Serial Number
--  📅 Date
--  ⏰ Time
--  🌐 Latitude
--  🌐 Longitude
+### List of 15 Felt Earthquakes 🤲
+
+Provides information on the 15 most recently felt earthquakes, including:
+
+-  📅 Date and Time
+-  🌐 Location
 -  🌋 Magnitude
 -  🌊 Depth
 -  🗺️ Region
--  💥 Potential
+-  😳 Felt intensity
+
+### Recent Earthquakes M 5.0+ 📈
+
+Lists information on recent earthquakes with a magnitude of 5.0 or higher, including:
+
+-  📅 Date and Time
+-  🌐 Location
+-  🌋 Magnitude
+-  🌊 Depth
+-  🗺️ Region
+-  💥 Potential impacts
+
+### Earthquake Frequency Timeline 📊
+
+A chart displaying the frequency of earthquakes over time.
+
+## Technologies Used 💻
+
+-  HTML5
+-  Tailwind CSS
+-  JavaScript
+-  Chart.js
+-  Leaflet.js
+-  Luxon
+-  Font Awesome
+-  Fancybox
 
 ## How to Use the Website 🌐👨‍💻
 
-1. Open the website page at [https://rehandias.github.io/gempa.github.io/](https://rehandias.github.io/gempa.github.io/).
-2. On the main page, you will see information about the latest earthquakes.
-3. To view information about the 15 earthquakes with a magnitude of 5.0 or higher, click on the "15 Earthquakes M 5.0+" tab at the top of the page.
+1. Open the website in your web browser.
+2. The main page displays the latest earthquake information and an interactive map.
+3. Scroll down to view the list of felt earthquakes and recent earthquakes M 5.0+.
+4. Explore the earthquake frequency timeline at the bottom of the page.
+
+## Local Development 🛠️
+
+To run this website locally:
+
+1. Clone the repository
+2. Open the `index.html` file in your web browser
+
+Note: Some features may require a local server to function properly due to CORS restrictions.
 
 ## Contact 📧📞
 
-If you have any questions or suggestions, please feel free to contact us via [email](rehanpratama282@gmail.com) or [Instagram](https://www.instagram.com/rehandiazz).
+For questions or suggestions, please contact the Meteorology, Climatology, and Geophysics Agency (BMKG).
+
+Visit the official BMKG website: [https://www.bmkg.go.id/](https://www.bmkg.go.id/)
 
 Thank you for using the BMKG Earthquake Information Website! 🙏
-
-=======
-
-# gempa-bmkg
