@@ -72,11 +72,11 @@ Instantly view details of the most recent seismic activity:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/bmkg-earthquake-dashboard.git
+    https://github.com/RehanDias/gempa.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd bmkg-earthquake-dashboard
+   cd gempa
    ```
 3. Open `index.html` in your browser or use a local server for full functionality.
 
