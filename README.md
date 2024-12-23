@@ -1,82 +1,113 @@
-# 🌍 BMKG Earthquake Information Dashboard
+# 🌍 BMKG Earthquake Monitor
 
 <div align="center">
   <img src="assets/img/bmkg.png" alt="BMKG Logo" width="150">
   <br>
-  <i>Real-time seismic monitoring for Indonesia</i>
+  <h3>Real-time Seismic Activity Tracking in Indonesia</h3>
+  <p>Stay informed about seismic events across the Indonesian archipelago</p>
+
+  <div>
+    <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Status">
+    <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge" alt="Version">
+    <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">
+  </div>
 </div>
 
 <hr>
 
-## 🌟 Features
+## 🎯 Overview
 
-| Feature               | Description                                              |
-| --------------------- | -------------------------------------------------------- |
-| 📡 Real-time Updates  | Get the latest earthquake data as it happens             |
-| 🗺️ Interactive Map    | Visualize earthquake locations on a dynamic map          |
-| 📊 Data Visualization | Explore earthquake trends with intuitive charts          |
-| 🔔 Felt Reports       | Access information on earthquakes felt by the population |
-| 📱 Responsive Design  | Seamless experience across desktop and mobile devices    |
-
-<hr>
-
-## 📊 Dashboard Sections
-
-### 1. Latest Earthquake Information
-
-Instantly view details of the most recent seismic activity:
-
--  🕒 Date and Time
--  📍 Precise Location
--  📏 Magnitude and Depth
--  🏘️ Affected Region
--  💥 Potential Impacts
-
-### 2. Interactive Earthquake Map
-
--  🌐 Dynamically plotted earthquake locations
--  🔍 Zoom and pan for detailed exploration
-
-### 3. Felt Earthquakes List
-
--  👥 Top 15 earthquakes felt by the population
--  🤲 Includes felt intensity reports
-
-### 4. Major Earthquakes (M 5.0+)
-
--  💪 List of significant seismic events
--  🚨 Potential hazard information
-
-### 5. Earthquake Frequency Timeline
-
--  📈 Visual representation of seismic activity over time
--  🔍 Identify patterns and trends
-
-<hr>
-
-## 🛠️ Technologies
+BMKG Earthquake Monitor provides real-time earthquake information from Indonesia's Meteorological, Climatological, and Geophysical Agency (BMKG). With an intuitive interface and powerful features, it helps users stay informed about seismic activities across the archipelago.
 
 <div align="center">
-
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white)
-![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)
-
+  <img src="assets/img/preview.png" alt="Dashboard Preview" width="100%">
 </div>
+
+## ✨ Key Features
+
+-  🔄 **Real-time Updates**: Automatic data refresh every 5 minutes
+-  📊 **Comprehensive Dashboard**:
+   -  Total events counter
+   -  Significant events tracker
+   -  Felt reports summary
+   -  Last update timestamp
+-  🗺️ **Interactive Map**: Dynamic visualization with color-coded markers
+-  📈 **Timeline Chart**: Historical earthquake frequency analysis
+-  📱 **Modern UI**: Responsive design with glass-morphism effects
+-  ⚡ **Performance**: Optimized loading with caching system
 
 <hr>
 
-## 🚀 Quick Start
+## 🔧 Technical Implementation
+
+### Frontend Technologies
+
+-  **CSS Framework**: Tailwind CSS with custom configurations
+-  **JavaScript Libraries**:
+   -  Chart.js for data visualization
+   -  Leaflet.js for interactive maps
+   -  Luxon for datetime handling
+   -  FancyBox for image galleries
+   -  Lodash for utility functions
+
+### Data Integration
+
+-  Real-time data from BMKG XML feeds:
+   -  Latest earthquakes
+   -  Felt earthquakes
+   -  Significant events (M 5.0+)
+
+### Performance Features
+
+-  Data caching system (5-minute cache duration)
+-  Throttled updates to prevent API overload
+-  Optimized asset loading
+-  Responsive image handling
+
+<hr>
+
+## 💫 UI Components
+
+### Dashboard Cards
+
+-  Latest Earthquake Information
+   -  Magnitude and depth display
+   -  Location details
+   -  Shakemap viewer (when available)
+   -  Felt reports integration
+
+### Interactive Tables
+
+-  Felt Earthquakes Table
+   -  Time and location
+   -  Magnitude classification
+   -  Impact reports
+-  Major Earthquakes Table
+   -  Chronological listing
+   -  Potential hazard information
+
+### Data Visualization
+
+-  Timeline Chart
+   -  Magnitude trends
+   -  Interactive tooltips
+   -  Dynamic date scaling
+-  Interactive Map
+   -  Color-coded markers
+   -  Popup information
+   -  Responsive sizing
+
+<hr>
+
+## 🚀 Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/bmkg-earthquake-dashboard.git
+   git clone https://rehandias.github.io/gempa.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd bmkg-earthquake-dashboard
+   cd gempa
    ```
 3. Open `index.html` in your browser or use a local server for full functionality.
 

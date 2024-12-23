@@ -4,6 +4,53 @@ let map;
 let markers = [];
 let timelineChart;
 
+// Add utility functions
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const cache = new Map();
+
+function showLoading() {
+   document.getElementById("loading-state").classList.remove("hidden");
+}
+
+function hideLoading() {
+   document.getElementById("loading-state").classList.add("hidden");
+}
+
+function showError(message) {
+   document.getElementById("error-message").textContent = message;
+   document.getElementById("error-state").classList.remove("hidden");
+}
+
+function hideError() {
+   document.getElementById("error-state").classList.add("hidden");
+}
+
+async function fetchWithTimeout(url, timeout = 5000) {
+   const controller = new AbortController();
+   const id = setTimeout(() => controller.abort(), timeout);
+   try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(id);
+      return response;
+   } catch (error) {
+      clearTimeout(id);
+      throw error;
+   }
+}
+
+async function fetchWithRetry(url, retries = 3) {
+   for (let i = 0; i < retries; i++) {
+      try {
+         return await fetchWithTimeout(url);
+      } catch (error) {
+         if (i === retries - 1) throw error;
+         await new Promise((resolve) =>
+            setTimeout(resolve, 1000 * Math.pow(2, i))
+         );
+      }
+   }
+}
+
 // Map functions
 function initMap() {
    map = L.map("map").setView([-2.5, 118], 5);
@@ -119,38 +166,72 @@ function parseDateTime(tanggal, jam, dateTimeISO) {
 }
 // Data fetching and processing
 async function fetchGempaData(url) {
+   const cached = cache.get(url);
+   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+   }
+
    try {
-      const response = await fetch(url);
+      showLoading();
+      const response = await fetchWithRetry(url);
       if (!response.ok) {
          throw new Error(`HTTP error! status: ${response.status}`);
       }
       const text = await response.text();
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(text, "text/xml");
-      return Array.from(xmlDoc.querySelectorAll("gempa")).map((item) => ({
-         Tanggal: item.querySelector("Tanggal")?.textContent || "",
-         Jam: item.querySelector("Jam")?.textContent || "",
-         DateTime: item.querySelector("DateTime")?.textContent || "",
-         Coordinates:
-            item.querySelector("point coordinates")?.textContent || "",
-         Lintang: item.querySelector("Lintang")?.textContent || "",
-         Bujur: item.querySelector("Bujur")?.textContent || "",
-         Magnitude: item.querySelector("Magnitude")?.textContent || "",
-         Kedalaman: item.querySelector("Kedalaman")?.textContent || "",
-         Wilayah: item.querySelector("Wilayah")?.textContent || "",
-         Potensi: item.querySelector("Potensi")?.textContent || "",
-         Dirasakan: item.querySelector("Dirasakan")?.textContent || "",
-         Shakemap: item.querySelector("Shakemap")?.textContent || "",
-      }));
+      const result = Array.from(xmlDoc.querySelectorAll("gempa")).map(
+         (item) => ({
+            Tanggal: item.querySelector("Tanggal")?.textContent || "",
+            Jam: item.querySelector("Jam")?.textContent || "",
+            DateTime: item.querySelector("DateTime")?.textContent || "",
+            Coordinates:
+               item.querySelector("point coordinates")?.textContent || "",
+            Lintang: item.querySelector("Lintang")?.textContent || "",
+            Bujur: item.querySelector("Bujur")?.textContent || "",
+            Magnitude: item.querySelector("Magnitude")?.textContent || "",
+            Kedalaman: item.querySelector("Kedalaman")?.textContent || "",
+            Wilayah: item.querySelector("Wilayah")?.textContent || "",
+            Potensi: item.querySelector("Potensi")?.textContent || "",
+            Dirasakan: item.querySelector("Dirasakan")?.textContent || "",
+            Shakemap: item.querySelector("Shakemap")?.textContent || "",
+         })
+      );
+
+      cache.set(url, {
+         data: result,
+         timestamp: Date.now(),
+      });
+
+      return result;
    } catch (error) {
       console.error("Error fetching earthquake data:", error);
-      showErrorMessage(
-         "Failed to load earthquake data. Please try again later."
-      );
-      return [];
+      showError("Failed to load earthquake data. Please try again later.");
+      throw error;
+   } finally {
+      hideLoading();
    }
 }
 
+// Add new function to update dashboard stats
+function updateDashboardStats(feltEarthquakes, recentEarthquakes) {
+   const allEvents = [...feltEarthquakes, ...recentEarthquakes];
+   const totalEvents = allEvents.length;
+   const significantEvents = allEvents.filter(
+      (eq) => parseFloat(eq.Magnitude) >= 5.0
+   ).length;
+   const feltReports = feltEarthquakes.length;
+
+   document.getElementById("total-events").textContent = totalEvents;
+   document.getElementById("significant-events").textContent =
+      significantEvents;
+   document.getElementById("felt-reports").textContent = feltReports;
+   document.getElementById("last-update").textContent = DateTime.now()
+      .setZone("Asia/Jakarta")
+      .toFormat("HH:mm 'WIB'");
+}
+
+// Update the existing updateAllEarthquakeData function
 async function updateAllEarthquakeData() {
    try {
       const feltEarthquakes = await fetchGempaData(
@@ -160,8 +241,9 @@ async function updateAllEarthquakeData() {
          "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.xml"
       );
 
+      updateDashboardStats(feltEarthquakes, recentLargeEarthquakes);
       createFeltEarthquakesTable(feltEarthquakes);
-      createTable(recentLargeEarthquakes);
+      createTable(recentLargeEarthquakes, "recent"); // Specify table type
       createTimelineChart([...feltEarthquakes, ...recentLargeEarthquakes]);
       addEarthquakeMarkers([...feltEarthquakes, ...recentLargeEarthquakes]);
    } catch (error) {
@@ -192,6 +274,15 @@ async function updateGempaData(url, isLatest) {
    }
 }
 
+// Add retry mechanism
+function retryDataLoad() {
+   hideError();
+   updateAllEarthquakeData();
+}
+
+// Improve update function with throttling
+const throttledUpdate = _.throttle(updateAllEarthquakeData, 10000);
+
 // UI update functions
 function createLatestGempaInfo(gempaData) {
    const latestGempaInfo = document.getElementById("latest-gempa-info");
@@ -199,67 +290,152 @@ function createLatestGempaInfo(gempaData) {
    const formattedDateTime = dateTime.isValid
       ? dateTime.toFormat("dd MMM yyyy HH:mm 'WIB'")
       : "Invalid Date";
+
+   const shakemapUrl = gempaData.Shakemap
+      ? `https://data.bmkg.go.id/DataMKG/TEWS/${gempaData.Shakemap}`
+      : null;
+
+   const magnitude = parseFloat(gempaData.Magnitude);
+   const magnitudeColor =
+      magnitude >= 6
+         ? "text-red-600"
+         : magnitude >= 5
+         ? "text-orange-500"
+         : "text-blue-600";
+
    latestGempaInfo.innerHTML = `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="space-y-6">
-                <h3 class="text-2xl md:text-3xl font-semibold text-bmkg-blue tracking-tight"><i class="fas fa-clipboard-list mr-2"></i>Earthquake Details</h3>
-                <div class="bg-gray-50 p-4 md:p-6 rounded-lg shadow-inner">
-                    <p class="mb-3 text-sm"><i class="far fa-clock mr-2"></i><span class="font-medium">Date & Time:</span> ${formattedDateTime}</p>
-                    <p class="mb-3 text-sm"><i class="fas fa-map-marker-alt mr-2"></i><span class="font-medium">Location:</span> ${
-                       gempaData.Lintang
-                    }, ${gempaData.Bujur}</p>
-                    <p class="mb-3 text-sm"><i class="fas fa-ruler mr-2"></i><span class="font-medium">Magnitude:</span> <span class="text-bmkg-red font-bold text-xl">${
-                       gempaData.Magnitude
-                    }</span></p>
-                    <p class="mb-3 text-sm"><i class="fas fa-level-down-alt mr-2"></i><span class="font-medium">Depth:</span> ${
-                       gempaData.Kedalaman
-                    }</p>
-                    <p class="mb-3 text-sm"><i class="fas fa-map mr-2"></i><span class="font-medium">Region:</span> ${
-                       gempaData.Wilayah
-                    }</p>
-                    <p class="mb-3 text-sm"><i class="fas fa-exclamation-triangle mr-2"></i><span class="font-medium">Potential:</span> ${
-                       gempaData.Potensi
-                    }</p>
+        <div class="space-y-3 sm:space-y-4 animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div class="space-y-3 sm:space-y-4">
+                    <!-- Magnitude and Depth Card -->
+                    <div class="bg-white/70 backdrop-blur-sm rounded-lg p-4 sm:p-5">
+                        <div class="flex items-center justify-between mb-2 sm:mb-3">
+                            <div>
+                                <h3 class="text-2xl sm:text-3xl font-bold ${magnitudeColor}">${
+      gempaData.Magnitude
+   }</h3>
+                                <p class="text-xs sm:text-sm text-gray-500">Magnitude (SR)</p>
+                            </div>
+                            <div class="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center ${
+                               magnitude >= 5 ? "bg-red-50" : "bg-blue-50"
+                            }">
+                                <i class="fas fa-wave-square text-lg sm:text-xl ${magnitudeColor}"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-800">${
+                                   gempaData.Kedalaman
+                                }</h4>
+                                <p class="text-sm text-gray-500">Depth</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Card -->
+                    <div class="bg-white/70 backdrop-blur-sm rounded-lg p-5">
+                        <div class="flex items-start space-x-3">
+                            <div class="h-9 w-9 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-pin text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-gray-800 font-medium leading-relaxed">${
+                                   gempaData.Wilayah
+                                }</p>
+                                <div class="inline-flex items-center px-2.5 py-0.5 mt-2 rounded-md bg-blue-50 text-sm text-blue-700">
+                                    ${gempaData.Lintang}, ${gempaData.Bujur}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Information Card -->
+                    <div class="bg-white/70 backdrop-blur-sm rounded-lg p-5">
+                        <div class="flex items-start space-x-3">
+                            <div class="h-9 w-9 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clock text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-lg font-medium text-gray-800">${formattedDateTime}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     ${
                        gempaData.Dirasakan
-                          ? `<p class="mb-3 text-sm"><i class="fas fa-hand-paper mr-2"></i><span class="font-medium">Felt:</span> ${gempaData.Dirasakan}</p>`
+                          ? `
+                    <div class="bg-white/70 backdrop-blur-sm rounded-lg p-5">
+                        <div class="flex items-start space-x-3">
+                            <div class="h-9 w-9 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-hand-paper text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-yellow-700 mb-1">Felt Reports</h4>
+                                <p class="text-gray-800">${gempaData.Dirasakan}</p>
+                            </div>
+                        </div>
+                    </div>
+                    `
+                          : ""
+                    }
+                </div>
+
+                <div class="space-y-4">
+                    ${
+                       shakemapUrl
+                          ? `
+                    <div class="bg-white/70 backdrop-blur-sm rounded-lg overflow-hidden">
+                        <div class="p-3 bg-gradient-to-r from-blue-600 to-blue-500">
+                            <h4 class="text-sm font-medium text-white flex items-center">
+                                <i class="fas fa-map mr-2"></i>Shakemap
+                            </h4>
+                        </div>
+                        <div class="p-3">
+                            <a href="${shakemapUrl}" data-fancybox class="block relative group">
+                                <img src="${shakemapUrl}" alt="Earthquake Shakemap" 
+                                    class="w-full h-auto rounded-md" 
+                                    loading="lazy">
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                    <div class="bg-white/90 rounded-full p-2">
+                                        <i class="fas fa-search-plus text-blue-600"></i>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    `
                           : ""
                     }
                 </div>
             </div>
-            ${
-               gempaData.Shakemap
-                  ? `
-            <div>
-                <h3 class="text-2xl md:text-3xl font-semibold mb-6 text-bmkg-blue tracking-tight"><i class="fas fa-map-marked-alt mr-2"></i>Shakemap</h3>
-                <div class="relative aspect-w-16 aspect-h-9">
-                    <div class="absolute inset-0 flex items-center justify-center bg-gray-200 rounded" id="shakemap-loading">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-bmkg-blue"></div>
-                    </div>
-                    <a href="https://static.bmkg.go.id/${gempaData.Shakemap}" 
-                       data-fancybox="shakemap" 
-                       class="shakemap-thumbnail block">
-                        <img src="https://static.bmkg.go.id/${gempaData.Shakemap}" 
-                             alt="Shakemap" 
-                             class="w-full h-full object-cover rounded shadow-sm transition-opacity duration-300 opacity-0 hover:opacity-90"
-                             loading="lazy"
-                             onload="this.classList.remove('opacity-0'); document.getElementById('shakemap-loading').classList.add('hidden');">
-                    </a>
-                </div>
-            </div>
-            `
-                  : ""
-            }
         </div>
     `;
 
    Fancybox.bind("[data-fancybox]", {
-      Image: { zoom: false },
+      Image: { zoom: true },
       Toolbar: {
-         display: { left: [], middle: [], right: ["close"] },
+         display: {
+            left: ["infobar"],
+            middle: [
+               "zoomIn",
+               "zoomOut",
+               "toggle1to1",
+               "rotateCCW",
+               "rotateCW",
+            ],
+            right: ["slideshow", "thumbs", "close"],
+         },
       },
       Thumbs: { showOnStart: false },
-      Carousel: { transition: "fade" },
+      Carousel: {
+         transition: "fade",
+         friction: 0.8,
+      },
+      Image: {
+         zoom: true,
+         protect: true,
+         animationEffect: "fade",
+      },
    });
 
    latestGempaInfo.classList.add("animate-shake");
@@ -270,58 +446,153 @@ function createLatestGempaInfo(gempaData) {
 
 function createFeltEarthquakesTable(data) {
    const tbody = document.querySelector("#gempa-dirasakan-table tbody");
+   if (!tbody) {
+      console.error("Felt earthquakes table not found in the document");
+      return;
+   }
+
    tbody.innerHTML = "";
 
-   data.forEach((gempaData, index) => {
-      const row = document.createElement("tr");
-      row.className = `hover:bg-gray-50 transition-colors duration-200 ${
-         index % 2 === 0 ? "bg-gray-100" : ""
-      }`;
-
+   data.forEach((gempaData) => {
       const dateTime = parseDateTime(gempaData.Tanggal, gempaData.Jam);
       const formattedDateTime = dateTime.isValid
          ? dateTime.toFormat("dd MMM yyyy HH:mm 'WIB'")
          : gempaData.Tanggal + " " + gempaData.Jam;
 
+      const row = document.createElement("tr");
+      row.className =
+         "hover:bg-blue-50/80 transition-colors border-b border-gray-200";
+
       row.innerHTML = `
-            <td class="py-4 px-4 text-sm">${formattedDateTime}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Lintang}, ${gempaData.Bujur}</td>
-            <td class="py-4 px-4 font-semibold text-bmkg-red text-sm">${gempaData.Magnitude}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Kedalaman}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Wilayah}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Dirasakan}</td>
+         <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center space-x-3">
+               <span class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span>
+               <span class="text-sm text-gray-800 font-medium">${formattedDateTime}</span>
+            </div>
+         </td>
+         <td class="px-6 py-4 whitespace-nowrap">
+            <span class="text-sm text-gray-700 font-medium">${
+               gempaData.Lintang
+            }, ${gempaData.Bujur}</span>
+         </td>
+         <td class="px-6 py-4 text-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+               parseFloat(gempaData.Magnitude) >= 5
+                  ? "bg-red-100 text-red-700"
+                  : "bg-blue-100 text-blue-700"
+            }">
+               ${gempaData.Magnitude} SR
+            </span>
+         </td>
+         <td class="px-6 py-4 text-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700">
+               ${gempaData.Kedalaman}
+            </span>
+         </td>
+         <td class="px-6 py-4">
+            <div class="text-sm text-gray-800">${formatRegion(
+               gempaData.Wilayah
+            )}</div>
+         </td>
+         <td class="px-6 py-4">
+            <div class="text-sm font-medium ${
+               gempaData.Dirasakan ? "text-amber-700" : "text-gray-500"
+            } max-w-xs">
+               ${gempaData.Dirasakan || "No impact reports"}
+            </div>
+         </td>
+      `;
+
+      tbody.appendChild(row);
+   });
+}
+
+function createTable(data, tableType = "recent") {
+   const tableId =
+      tableType === "recent" ? "gempa-table" : "gempa-dirasakan-table";
+   const tbody = document.querySelector(`#${tableId} tbody`);
+
+   if (!tbody) {
+      console.error(`Table with id '${tableId}' not found in the document`);
+      return;
+   }
+
+   tbody.innerHTML = "";
+
+   data.forEach((gempaData) => {
+      const dateTime = parseDateTime(gempaData.Tanggal, gempaData.Jam);
+      const formattedDateTime = dateTime.isValid
+         ? dateTime.toFormat("dd MMM yyyy HH:mm 'WIB'")
+         : gempaData.Tanggal + " " + gempaData.Jam;
+
+      const magnitude = parseFloat(gempaData.Magnitude);
+      const row = document.createElement("tr");
+      row.className =
+         "hover:bg-red-50/70 transition-colors border-b border-gray-200";
+
+      row.innerHTML = `
+            <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <span class="w-2 sm:w-3 h-2 sm:h-3 bg-red-500 rounded-full ${
+                       magnitude >= 5 ? "animate-pulse" : ""
+                    }"></span>
+                    <span class="text-xs sm:text-sm text-gray-800 font-medium">${formattedDateTime}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-sm text-gray-700 font-medium">${
+                   gempaData.Lintang
+                }, ${gempaData.Bujur}</span>
+            </td>
+            <td class="px-6 py-4 text-center">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                   magnitude >= 6
+                      ? "bg-red-100 text-red-700"
+                      : magnitude >= 5
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-blue-100 text-blue-700"
+                }">
+                    ${gempaData.Magnitude} SR
+                </span>
+            </td>
+            <td class="px-6 py-4 text-center">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700">
+                    ${gempaData.Kedalaman}
+                </span>
+            </td>
+            <td class="px-6 py-4">
+                <div class="text-sm text-gray-800">${formatRegion(
+                   gempaData.Wilayah
+                )}</div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="text-sm font-medium ${
+                   gempaData.Potensi ? "text-red-700" : "text-gray-500"
+                } max-w-xs">
+                    ${gempaData.Potensi || "No potential impact"}
+                </div>
+            </td>
         `;
 
       tbody.appendChild(row);
    });
 }
 
-function createTable(data) {
-   const tbody = document.querySelector("#gempa-table tbody");
-   tbody.innerHTML = "";
-
-   data.forEach((gempaData, index) => {
-      const row = document.createElement("tr");
-      row.className = `hover:bg-gray-50 transition-colors duration-200 ${
-         index % 2 === 0 ? "bg-gray-100" : ""
-      }`;
-
-      const dateTime = parseDateTime(gempaData.Tanggal, gempaData.Jam);
-      const formattedDateTime = dateTime.isValid
-         ? dateTime.toFormat("dd MMM yyyy HH:mm 'WIB'")
-         : gempaData.Tanggal + " " + gempaData.Jam;
-
-      row.innerHTML = `
-            <td class="py-4 px-4 text-sm">${formattedDateTime}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Lintang}, ${gempaData.Bujur}</td>
-            <td class="py-4 px-4 font-semibold text-bmkg-red text-sm">${gempaData.Magnitude}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Kedalaman}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Wilayah}</td>
-            <td class="py-4 px-4 text-sm">${gempaData.Potensi}</td>
-        `;
-
-      tbody.appendChild(row);
-   });
+// Add this new helper function to format region text
+function formatRegion(region) {
+   // Split location components and format them
+   const parts = region.split(",").map((part) => part.trim());
+   if (parts.length > 1) {
+      return parts
+         .map((part, index) => {
+            if (index === parts.length - 1) {
+               return `<span class="font-medium text-blue-700">${part}</span>`;
+            }
+            return part;
+         })
+         .join("<br>");
+   }
+   return region;
 }
 
 function createTimelineChart(earthquakes) {
@@ -427,21 +698,24 @@ function createTimelineChart(earthquakes) {
          },
          plugins: {
             tooltip: {
-               backgroundColor: "#ffffff",
-               titleColor: "#111827", // Tailwind gray-900
-               bodyColor: "#4b5563", // Tailwind gray-600
-               borderColor: "#e5e7eb", // Tailwind gray-200
+               backgroundColor: "rgba(255, 255, 255, 0.95)",
+               titleColor: "#1f2937",
+               bodyColor: "#4b5563",
+               borderColor: "#e5e7eb",
                borderWidth: 1,
                titleFont: {
                   family: "Inter, sans-serif",
-                  size: 12,
-                  weight: "bold",
+                  size: 13,
+                  weight: "600",
                },
                bodyFont: {
                   family: "Inter, sans-serif",
-                  size: 11,
+                  size: 12,
                },
-               padding: 8,
+               padding: 12,
+               boxPadding: 6,
+               usePointStyle: true,
+               boxWidth: 8,
                callbacks: {
                   title: function (tooltipItems) {},
                   label: function (context) {
@@ -517,15 +791,25 @@ function getLatestGempaInfo() {
    updateGempaData("https://data.bmkg.go.id/DataMKG/TEWS/autogempa.xml", true);
 }
 
+// Add this new function for responsive map handling
+function handleResponsiveMap() {
+   if (map) {
+      setTimeout(() => {
+         map.invalidateSize();
+      }, 100);
+   }
+}
+
 // Event listeners and initialization
 document.addEventListener("DOMContentLoaded", () => {
    initMap();
    updateAllEarthquakeData();
    getLatestGempaInfo();
    setInterval(getLatestGempaInfo, 300000); // 5 minutes
-   setInterval(updateAllEarthquakeData, 900000); // 15 minutes
+   setInterval(throttledUpdate, 900000); // 15 minutes
    setInterval(updateTime, 1000);
    updateTime(); // Initial call
+   window.addEventListener("resize", _.debounce(handleResponsiveMap, 250));
 });
 
 // Service Worker Registration
