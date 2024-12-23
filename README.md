@@ -10,18 +10,27 @@
     <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Status">
     <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge" alt="Version">
     <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">
+    <img src="https://img.shields.io/badge/Updated-Daily-green?style=for-the-badge" alt="Updates">
   </div>
+
+  <br>
+  <p align="center">
+    <a href="#-key-features">Features</a> •
+    <a href="#-installation">Installation</a> •
+    <a href="#-technical-implementation">Tech Stack</a> •
+    <a href="#-contributing">Contributing</a> •
+    <a href="#-contact">Contact</a>
+  </p>
 </div>
 
 <hr>
 
-## 🎯 Overview
+## 🌟 Highlights
 
-BMKG Earthquake Monitor provides real-time earthquake information from Indonesia's Meteorological, Climatological, and Geophysical Agency (BMKG). With an intuitive interface and powerful features, it helps users stay informed about seismic activities across the archipelago.
-
-<div align="center">
-  <img src="assets/img/preview.png" alt="Dashboard Preview" width="100%">
-</div>
+-  🚀 **Real-time Monitoring**: Live earthquake data updates every 5 minutes
+-  🎯 **High Accuracy**: Direct feed from BMKG's official data sources
+-  💡 **Smart Features**: Intelligent data processing and visualization
+-  🔒 **Reliable**: Built with robust error handling and failsafes
 
 ## ✨ Key Features
 
@@ -38,7 +47,20 @@ BMKG Earthquake Monitor provides real-time earthquake information from Indonesia
 
 <hr>
 
-## 🔧 Technical Implementation
+## 🛠️ Technical Implementation
+
+### Tech Stack
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="https://raw.githubusercontent.com/tailwindlabs/tailwindcss/master/.github/logo-dark.svg" width="40"><br><sub><b>Tailwind CSS</b></sub></td>
+      <td align="center"><img src="https://www.chartjs.org/img/chartjs-logo.svg" width="40"><br><sub><b>Chart.js</b></sub></td>
+      <td align="center"><img src="https://leafletjs.com/docs/images/logo.png" width="40"><br><sub><b>Leaflet.js</b></sub></td>
+      <td align="center"><img src="https://moment.github.io/luxon/docs/_media/Luxon_icon_64x64.png" width="40"><br><sub><b>Luxon</b></sub></td>
+    </tr>
+  </table>
+</div>
 
 ### Frontend Technologies
 
@@ -99,7 +121,14 @@ BMKG Earthquake Monitor provides real-time earthquake information from Indonesia
 
 <hr>
 
-## 🚀 Installation
+## 🚀 Quick Start
+
+### Prerequisites
+
+-  Modern web browser (Chrome, Firefox, Safari, Edge)
+-  Internet connection for real-time updates
+
+### Installation Steps
 
 1. Clone the repository:
 
@@ -121,9 +150,51 @@ BMKG Earthquake Monitor provides real-time earthquake information from Indonesia
 
 <hr>
 
+## 📊 Features Overview
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://img.icons8.com/fluency/48/000000/dashboard.png"/><br>
+      <b>Dynamic Dashboard</b><br>
+      Real-time statistics
+    </td>
+    <td align="center">
+      <img src="https://img.icons8.com/fluency/48/000000/map-marker.png"/><br>
+      <b>Interactive Map</b><br>
+      Visual tracking
+    </td>
+    <td align="center">
+      <img src="https://img.icons8.com/fluency/48/000000/line-chart.png"/><br>
+      <b>Time Analysis</b><br>
+      Trend visualization
+    </td>
+  </tr>
+</table>
+
+## 🌐 Live Demo
+
+Try the live version: [BMKG Earthquake Monitor](https://rehandias.github.io/gempa)
+
+## 📱 Mobile View
+
+The dashboard is fully responsive and works seamlessly on mobile devices.
+
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Here's how you can help:
+
+-  🐛 Report bugs
+-  💡 Suggest features
+-  🔧 Submit pull requests
+
+<hr>
+
+## 📜 Acknowledgements
+
+-  Data provided by [BMKG Indonesia](https://www.bmkg.go.id/)
+-  Icons by [Icons8](https://icons8.com/)
+-  Special thanks to all contributors
 
 <hr>
 
@@ -147,5 +218,9 @@ For official BMKG information:
 <hr>
 
 <div align="center">
-  <sub>Built with ❤️ by rehan dias</sub>
+  <br>
+  <p>
+    <sub>If you found this project helpful, consider giving it a ⭐</sub>
+  </p>
+  <sub>Built with ❤️ by rehan dias in 🇮🇩</sub>
 </div>
