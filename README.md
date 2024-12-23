@@ -102,13 +102,17 @@ BMKG Earthquake Monitor provides real-time earthquake information from Indonesia
 ## 🚀 Installation
 
 1. Clone the repository:
+
    ```bash
-<<<<<<< HEAD
-   git clone https://rehandias.github.io/gempa.git
-=======
-    https://github.com/RehanDias/gempa.git
->>>>>>> a87e1d2269f2776f1f86d0c340758062d4550500
+   git clone https://github.com/RehanDias/gempa.git
    ```
+
+   or visit the live site:
+
+   ```
+   https://rehandias.github.io/gempa
+   ```
+
 2. Navigate to the project directory:
    ```bash
    cd gempa
